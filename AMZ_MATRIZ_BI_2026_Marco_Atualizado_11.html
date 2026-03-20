@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AMZ COMÉRCIO Matriz – BI 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"Inter",sans-serif;background:#f0ede8;height:100vh;display:flex;overflow:hidden;font-size:13px;}
+.sb{width:86px;background:#1a1a2c;display:flex;flex-direction:column;align-items:center;padding:16px 0 20px;flex-shrink:0;height:100vh;gap:2px;}
+.sb-logo{text-align:center;margin-bottom:18px;padding:0 6px;}
+.nav{width:70px;padding:9px 4px;border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#4a5080;transition:all .18s;border:1px solid transparent;}
+.nav:hover{background:#ffffff10;color:#a0aad0;}
+.nav.on{background:#f5a62320;color:#f5a623;border-color:#f5a62340;}
+.nav-i{font-size:17px;} .nav-t{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;line-height:1.3;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.top{background:#fff;padding:8px 16px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #eaeaea;flex-shrink:0;flex-wrap:wrap;}
+.tbtn{padding:6px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#f0f0f0;color:#666;font-family:inherit;transition:all .15s;}
+.tbtn.on{background:#f5a623;color:#fff;} .tbtn:hover:not(.on){background:#e4e4e4;}
+.sep{width:1px;height:22px;background:#eaeaea;margin:0 2px;flex-shrink:0;}
+.flt{display:flex;align-items:center;gap:4px;}
+.fl{font-size:11px;font-weight:700;color:#333;white-space:nowrap;}
+.fs{border:1.5px solid #e0e0e0;border-radius:6px;padding:5px 22px 5px 8px;font-size:11px;font-weight:600;color:#333;background:#fff;appearance:none;cursor:pointer;outline:none;font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;}
+.fs:focus{border-color:#f5a623;}
+.krow{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-bottom:3px solid #f5a62330;flex-shrink:0;}
+.kcard{padding:11px 14px;border-right:1px solid #f2f2f2;display:flex;flex-direction:column;}
+.kcard:last-child{border-right:none;}
+.kn{font-size:9px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px;}
+.kv{font-size:22px;font-weight:800;color:#111;letter-spacing:-1px;line-height:1;}
+.kv.neg{color:#e03535;} .kv.pos{color:#1a9e5c;}
+.kp{font-size:10px;font-weight:600;color:#f5a623;margin-top:1px;}
+.kr{font-size:9px;color:#ccc;font-style:italic;}
+.cnt{flex:1;overflow:hidden;background:#f5a62315;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.page{display:none;flex:1;flex-direction:column;gap:10px;overflow:hidden;}
+.page.vis{display:flex;}
+.card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 10px #0000000d;}
+.card-h{padding:10px 14px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;justify-content:space-between;}
+.card-h h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#555;}
+.tscroll{overflow:auto;flex:1;}
+.tscroll::-webkit-scrollbar{height:5px;width:4px;}
+.tscroll::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px;}
+table{width:100%;border-collapse:collapse;}
+thead tr{position:sticky;top:0;z-index:5;}
+th{background:#fafafa;padding:8px 11px;text-align:right;font-size:10px;font-weight:700;color:#888;border-bottom:2px solid #f0f0f0;white-space:nowrap;}
+th:first-child{text-align:left;position:sticky;left:0;z-index:6;background:#fafafa;min-width:220px;border-right:1px solid #f0f0f0;}
+th.cr{color:#1a9e5c;background:#f0fdf5;} th.ct{background:#f5f5f5;color:#555;border-left:2px solid #ebebeb;}
+tbody tr{border-bottom:1px solid #f8f8f8;transition:background .08s;}
+tbody tr:hover{background:#fffbf0;}
+tbody tr.ttl{background:#1a1a2c;}
+tbody tr.ttl td{color:#fff!important;font-weight:800;font-size:12px;border:none;}
+tbody tr.ttl td:first-child{background:#1a1a2c!important;color:#f5a623!important;}
+tbody tr.sum-row td{background:#f9f7f0!important;font-weight:700;}
+tbody tr.sum-row td:first-child{background:#f9f7f0!important;color:#1a1a2c;}
+td{padding:7px 11px;text-align:right;white-space:nowrap;color:#333;}
+td:first-child{text-align:left;position:sticky;left:0;background:#fff;z-index:1;border-right:1px solid #f5f5f5;font-weight:500;}
+tbody tr:hover td:first-child{background:#fffbf0;}
+td.cr{background:#f5fdf8;} tbody tr:hover td.cr{background:#e8fbf0;}
+td.ct{background:#fafafa;border-left:2px solid #ebebeb;font-weight:700;}
+tbody tr.ttl td.cr{background:#1a1a2c!important;} tbody tr.ttl td.ct{background:#1a1a2c!important;}
+tbody tr.sum-row td.cr{background:#f2efe0!important;} tbody tr.sum-row td.ct{background:#f2efe0!important;}
+tbody tr.sub{display:none;} tbody tr.sub td:first-child{padding-left:32px;color:#888;font-size:11px;font-style:italic;}
+tbody tr.sub.vis{display:table-row;} tbody tr.sub td:first-child{background:#fafafa;}
+tbody tr.sub:hover td{background:#fffcf5;} tbody tr.sub:hover td:first-child{background:#fffcf5;}
+.pos{color:#1a9e5c!important;font-weight:600;} .neg{color:#e03535!important;font-weight:600;} .zer{color:#ccc!important;}
+.exp{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:#f0f0f0;font-size:9px;margin-right:6px;color:#888;font-weight:800;vertical-align:middle;transition:transform .15s;cursor:pointer;}
+.exp.open{transform:rotate(45deg);background:#f5a62333;color:#f5a623;}
+.sbadge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;}
+.sbadge.pago{background:#dcfce7;color:#166534;} .sbadge.prev{background:#fef9c3;color:#854d0e;} .sbadge.venc{background:#fee2e2;color:#991b1b;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kpi-big{padding:16px;display:flex;flex-direction:column;gap:4px;}
+.kpi-big .kn{font-size:10px;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:.7px;}
+.kpi-big .kv{font-size:26px;font-weight:800;letter-spacing:-1px;color:#111;line-height:1;}
+.kpi-big .kv.neg{color:#e03535;} .kpi-big .kv.pos{color:#1a9e5c;}
+.kpi-big .sub{font-size:11px;color:#888;margin-top:2px;}
+.sbar{padding:8px 12px;border-bottom:1px solid #f5f5f5;display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.sbar input{flex:1;border:1.5px solid #e8e8e8;border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;outline:none;color:#333;}
+.sbar input:focus{border-color:#f5a623;}
+.sbar span{font-size:11px;color:#aaa;white-space:nowrap;}
+.chart-wrap{position:relative;padding:12px;flex:1;min-height:0;}
+</style>
+</head>
+<body>
+
+<aside class="sb">
+  <div class="sb-logo">
+    <div style="text-align:center;padding:4px 6px;">
+      <div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:1px;line-height:1.2;">AMZ COMÉRCIO</div>
+      <div style="font-size:10px;font-weight:600;color:#f5a623;letter-spacing:2px;text-transform:uppercase;margin-top:2px;">MATRIZ</div>
+    </div>
+  </div>
+  <div class="nav" onclick="goPage('dre',this)"><div class="nav-i">&#128203;</div><div class="nav-t">DRE<br>Gerencial</div></div>
+  <div class="nav on" onclick="goPage('fluxo',this)"><div class="nav-i">&#128184;</div><div class="nav-t">Fluxo<br>de Caixa</div></div>
+  <div class="nav" onclick="goPage('caixa',this)"><div class="nav-i">&#127981;</div><div class="nav-t">Caixa</div></div>
+  <div class="nav" onclick="goPage('analises',this)"><div class="nav-i">&#128269;</div><div class="nav-t">An&aacute;lises</div></div>
+  <div class="nav" onclick="goPage('kpis',this)"><div class="nav-i">&#128202;</div><div class="nav-t">KPI&#39;s</div></div>
+</aside>
+
+<div class="main">
+  <div class="top">
+    <button class="tbtn" onclick="setTab('realizado',this)">Realizado</button>
+    <button class="tbtn on" onclick="setTab('projecao',this)">Proje&ccedil;&atilde;o</button>
+    <div class="sep"></div>
+    <div class="flt"><span class="fl">Empresa</span><select class="fs"><option>AAMZ COMÉRCIO Matriz LTDA</option></select></div>
+    <div class="flt"><span class="fl">Centro de Custo</span><select class="fs"><option>Todos</option><option>AMZ COMÉRCIO Matriz</option></select></div>
+    <div class="flt"><span class="fl">Ano</span><select class="fs"><option>2026</option></select></div>
+    <div class="flt"><span class="fl">M&ecirc;s</span>
+      <select class="fs" id="mf" onchange="onMes()">
+        <option value="">Todos</option>
+        <option value="0">Janeiro</option><option value="1">Fevereiro</option>
+        <option value="2">Mar&ccedil;o</option><option value="3">Abril</option>
+        <option value="4">Maio</option><option value="5">Junho</option>
+        <option value="6">Julho</option><option value="7">Agosto</option>
+        <option value="8">Setembro</option><option value="9">Outubro</option>
+        <option value="10">Novembro</option><option value="11">Dezembro</option>
+      </select></div>
+  </div>
+
+  <div class="krow" id="krow"></div>
+
+  <div class="cnt">
+
+    <!-- FLUXO -->
+    <div class="page vis" id="page-fluxo">
+      <div class="card" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="sbar">
+          <input type="text" id="srch" placeholder="&#128269; Buscar fornecedor, grupo..." oninput="onSearch()">
+          <span id="cnt_lbl"></span>
+        </div>
+        <div class="tscroll"><table id="tbl-fluxo"></table></div>
+      </div>
+    </div>
+
+    <!-- DRE -->
+    <div class="page" id="page-dre">
+      <div class="card" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="card-h"><h3>DRE Gerencial 2026</h3><span style="font-size:11px;color:#aaa">Valores em R$</span></div>
+        <div class="tscroll"><table id="tbl-dre"></table></div>
+      </div>
+    </div>
+
+    <!-- CAIXA -->
+    <div class="page" id="page-caixa">
+      <div class="grid3" style="flex-shrink:0;">
+        <div class="card"><div class="card-h"><h3>&#127981; BB 28923-X</h3></div><div id="caixa-bb" class="kpi-big"></div></div>
+        <div class="card"><div class="card-h"><h3>&#127981; SICREDI 74762-5</h3></div><div id="caixa-si" class="kpi-big"></div></div>
+        <div class="card"><div class="card-h"><h3>&#127981; CAIXA ECONÔMICA</h3></div><div id="caixa-cx" class="kpi-big"></div></div>
+      </div>
+      <div class="card" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+        <div class="card-h"><h3>Evolu&ccedil;&atilde;o do Saldo Acumulado</h3></div>
+        <div class="chart-wrap"><canvas id="chart-caixa"></canvas></div>
+      </div>
+      <div class="card" style="flex-shrink:0;">
+        <div class="card-h"><h3>&#9654; Realizado vs Projetado</h3><span style="font-size:10px;color:#aaa">Execução orçamentária do ano</span></div>
+        <div id="status-summary" style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f5f5f5;"></div>
+        <div style="padding:8px 14px 4px;display:flex;align-items:center;gap:8px;font-size:10px;color:#888;">
+          <span style="font-weight:700;color:#333;">Execução do orçamento:</span>
+          <div style="flex:1;background:#f0f0f0;border-radius:99px;height:8px;overflow:hidden;">
+            <div id="exec-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#1a9e5c,#f5a623);transition:width .5s;"></div>
+          </div>
+          <span id="exec-pct" style="font-weight:800;color:#1a9e5c;white-space:nowrap;"></span>
+        </div>
+        <div class="tscroll" style="max-height:130px;"><table id="tbl-status"></table></div>
+      </div>
+    </div>
+
+    <!-- ANÁLISES -->
+    <div class="page" id="page-analises">
+      <div class="grid2" style="flex:1;min-height:0;">
+        <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+          <div class="card-h"><h3>Receitas vs Despesas por M&ecirc;s</h3></div>
+          <div class="chart-wrap"><canvas id="chart-recdesp"></canvas></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+          <div class="card-h"><h3>Despesas por Centro de Custo</h3></div>
+          <div class="chart-wrap"><canvas id="chart-depara"></canvas></div>
+        </div>
+      </div>
+      <div class="grid2" style="flex:1;min-height:0;">
+        <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+          <div class="card-h"><h3>Evolu&ccedil;&atilde;o do Saldo 2026</h3></div>
+          <div class="chart-wrap"><canvas id="chart-saldo"></canvas></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+          <div class="card-h"><h3>Top Categorias de Despesa</h3></div>
+          <div class="chart-wrap"><canvas id="chart-categ"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="page" id="page-kpis">
+      <div class="grid4" style="flex-shrink:0;" id="kpi-cards"></div>
+      <div class="grid2" style="flex:1;min-height:0;">
+        <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+          <div class="card-h"><h3>Margem Bruta e L&iacute;quida</h3></div>
+          <div class="chart-wrap"><canvas id="chart-margem"></canvas></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+          <div class="card-h"><h3>Receita vs Meta Mensal</h3></div>
+          <div class="chart-wrap"><canvas id="chart-meta"></canvas></div>
+        </div>
+      </div>
+      <div class="card" style="flex-shrink:0;">
+        <div class="card-h"><h3>Top 10 Maiores Despesas por Fornecedor</h3></div>
+        <div class="tscroll" style="max-height:140px;"><table id="tbl-top10"></table></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const MESES=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const MABR=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const REAL=[0,1,2];
+const AD={"grupo_mes":{"Receitas de Vendas":[62000.0,9384.7,21481.02,149447.65,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01],"Receitas Financeiras":[21.27,17.65,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Deduções sobre Receitas":[0.0,0.0,0.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0],"Despesas com Pessoal":[-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79],"Despesas com serviços terceirizados":[-13686.94,-11700.0,-20587.5,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0],"Despesas com Infra e Softwares de Apoio":[-273.34,-1052.78,-327.79,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9],"Despesas Financeiras":[-73.22,-435.84,-210.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Despesas G&A":[-156.4,-519.9,-249.11,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34],"Custos com serviço":[-764.38,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Custos com produto":[0.0,-3370.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Despesas não operacionais":[-889.3,-1015.0,-5555.74,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16],"Outras saídas de caixa":[0.0,-403.23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Empréstimos":[-70183.62,74637.49,-79563.01,-112389.92,-77593.69,-55489.89,-40832.35,-21637.93,-50550.97,-60806.96,-45334.3,-35074.03],"Entrada de Transferência":[15137.93,0.0,13645.64,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"classif_mes":{"01 - (+) Receita Bruta":[62000.0,9384.7,21481.02,149447.65,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01],"02 - (-) Deduções sobre Receita":[0.0,0.0,0.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0],"04 - (-) Despesas":[-15954.15,-17841.47,-26903.93,-13172.19,-13172.19,-13172.19,-13172.19,-13172.19,-13172.19,-13172.19,-13172.19,-13172.19],"06 - (=) Resultado Financeiro":[-73.22,-435.84,-210.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"13 - (=) Outras movimentações de caixa":[-55024.42,74251.91,-65917.37,-112389.92,-77593.69,-55489.89,-40832.35,-21637.93,-50550.97,-60806.96,-45334.3,-35074.03]},"saldo_ini":[29924.41,20872.62,86216.14,14721.81,38407.35,-52558.52,-121420.59,-175625.12,-210635.23,-274558.38,-348737.52,-407444.0],"totais":[20872.62,86231.92,14721.81,38407.35,-52558.52,-121420.59,-175625.12,-210635.23,-274558.38,-348737.52,-407444.0,-455890.21],"depara":{"GUDZ MATRIZ":[-0.01,0.0,-59646.05,23685.54,-90965.87,-68862.07,-54204.53,-35010.11,-63923.15,-74179.14,-58706.48,-48446.21],"GUDZ":[-9051.78,66359.3,-11904.63,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"status":{"PAGO":[-9051.79,66359.3,-12205.19,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"PREVISÃO":[0.0,0.0,-59345.49,-26428.7,-224714.4,-151035.08,-102176.63,-38195.2,-38195.2,-38195.2,-38195.2,-38195.2]},"cat":{"Juros":[-59.89,-432.97,-210.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Amortização de empréstimos":[-70183.62,-68862.51,-99563.01,-159319.07,-208157.13,-134477.81,-85619.36,-21637.93,-21637.93,-21637.93,-21637.93,-21637.93],"Honorários consultoria":[-11800.0,-11700.0,-13900.0,-14200.0,-13900.0,-9700.0,-9700.0,-9700.0,-9700.0,-9700.0,-9700.0,-9700.0],"Entrada de Transferência":[15137.93,1000.0,13645.64,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Tarifas bancárias":[-156.4,-519.9,-249.11,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34],"Seguro de vida":[-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79],"Receita de Venda de Produto":[62000.0,9384.7,21481.02,149447.65,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01],"Taxa de Fiscalização":[-764.38,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Softwares e ferramentas de marketing e vendas":[-33.44,-812.88,-87.89,-229.29,-229.29,-229.29,-229.29,-229.29,-229.29,-229.29,-229.29,-229.29],"Softwares e ferramentas G&A":[-239.9,-239.9,-239.9,-595.7,-595.7,-595.7,-595.7,-595.7,-595.7,-595.7,-595.7,-595.7],"Honorários contábeis":[-1886.94,0.0,-1886.94,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"ICMS":[-889.3,0.0,0.0,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62],"IR":[-3.2,-0.14,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"IOF":[-10.13,-2.73,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Rendimentos de aplicações":[21.27,17.65,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"ISS":[0.0,0.0,0.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0],"Frete e transporte de mercadoria":[0.0,-3370.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Entrada de empréstimo InterCompany":[0.0,143500.0,20000.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Outras saídas de caixa":[0.0,-403.23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Honorários advocatícios":[0.0,-115.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Parcelamento de Impostos":[0.0,-899.2,-5555.74,-4656.54,-4656.54,-4656.54,-4656.54,-4656.54,-4656.54,-4656.54,-4656.54,-4656.54]},"grouped":{"Despesas Financeiras":{"0":{"PAGTO CM CONTR ROTATIVO":-0.01,"PAGTO JUROS CONTR ROTATIV":-0.01,"IOF ADICIONAL PJ-CH. ESPE":-4.32,"IOF BASICO CH PJ":-0.28,"COBRANÇA DE JUROS":-53.26,"DÉBITO DE IOF":-2.01,"IR sobre resgates no mês:":-3.2,"IOF sobre resgates no mês:":-10.13},"1":{"PAGTO CM CONTR ROTATIVO":-0.01,"PAGTO JUROS CONTR ROTATIV":-0.01,"IOF S/SALDO DEV":-167.6,"IOF ADICIONAL PJ-CH. ESPE":-1.71,"IOF BASICO CH PJ":-26.34,"COBRANÇA DE JUROS":-102.67,"DÉBITO DE IOF":-2.92,"JUROS UTILIZ.CH.ESPECIAL":-55.38,"Juros Mora":-4.14,"Juros do Rotativo":-65.82,"Multa por Atraso":-6.37,"IOF de Financiamento":-1.02,"IR sobre resgates no mês:":-0.14,"IOF sobre resgates no mês:":-1.71},"2":{"COBRANÇA DE JUROS":-102.67,"IOF BASICO CH PJ":-52.78,"IOF S/SALDO DEV":-13.27,"PAGTO JUROS CONTR ROTATIV":-36.85,"DÉBITO DE IOF":-2.92,"IOF Compra Internacional":-1.9,"PAGTO CM CONTR ROTATIVO":-0.01}},"Empréstimos":{"0":{"CAIXA ECONOMICA EMPRÉSTIMO":-6164.91,"Liquidação de Parcela - Sicredi":-15137.93,"PRIME HOUSE LTDA":-7450.0,"Termo de Moedas":-41192.93,"Juros Saldo Dev":-237.85},"1":{"CAIXA ECONOMICA EMPRÉSTIMO":-13386.24,"AMZ COMERCIO FILIAL":143500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Ajuste Termo de Moedas":-5880.63,"Contrat Câmbio Importação":-29089.44,"Tar Unica Contr Impor TP4":-1100.0,"Retenção Imposto de Renda":-209.29,"Juros Saldo Dev":-1058.98,"Weslley Santos Soares":-3000.0},"2":{"AMZ COMERCIO FILIAL":20000.0,"Liquidação de Parcela - Sicredi":-15137.93,"CAIXA ECONOMICA EMPRÉSTIMO":-6233.24,"Contrat Câmbio Importação":-76500.0,"Despesa Externa":-1268.88,"Ressarcimento de Tributo Des":-422.96},"3":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-41304.34,"Weslley Santos Soares":-149447.65,"47341761000170 WRMB Empréstimo":100000.0},"4":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-55955.76},"5":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-33851.96},"6":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-19194.42},"7":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93},"8":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-28913.04},"9":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-39169.03},"10":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-23696.37},"11":{"CAIXA ECONOMICA EMPRÉSTIMO":-6500.0,"Liquidação de Parcela - Sicredi":-15137.93,"Contrat Câmbio Importação":-13436.1}},"Despesas com serviços terceirizados":{"0":{"W3M CONSULTORIA E SERVICOS":-2000.0,"39.981.935DIRCEMARIADOSSANTOS":-4800.0,"Vitor Rocha Monteiro De Az":-5000.0,"Soares Contabilidade":-1886.94},"1":{"Vitor Rocha Monteiro De Az":-4000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-5200.0},"2":{"39.981.935DIRCEMARIADOSSANTOS":-8700.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"Vitor Rocha Monteiro De Az":-2000.0,"Soares Contabilidade":-2187.5,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-5200.0},"3":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"4":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"5":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"6":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"7":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"8":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"9":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"10":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0},"11":{"Vitor Rocha Monteiro De Az":-2000.0,"W3M CONSULTORIA E SERVICOS":-2500.0,"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":-2600.0}},"Receitas de Vendas":{"0":{"55619444000100 GRATUS COME":62000.0},"1":{"MERCADO LIVRE - MERCADO PAGO":9384.7},"2":{"MERCADO LIVRE - MERCADO PAGO":3072.0,"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":18409.02},"3":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":149447.65},"4":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"5":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"6":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"7":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"8":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"9":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"10":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01},"11":{"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":0.01}},"Entrada de Transferência":{"0":{"RESG.APLIC.FIN.AVISO PREV":15137.93,"Transferencia entre Contas":0.0},"1":{"Transferencia entre Contas":1000.0},"2":{"RESG.APLIC.FIN.AVISO PREV":13645.64}},"Despesas G&A":{"0":{"Tarifa Pacote de Serviços":-81.4,"Mensalidade Cesta Serviço":-75.0},"1":{"Tarifa Pacote de Serviços":-333.4,"Tarifa Renovação Cadastro":-36.5,"Anuidade Diferenciada 11/12":-37.5,"Anuidade Diferenciada 12/12":-37.5,"Mensalidade Cesta Serviço":-75.0},"2":{"Tarifa Pacote de Serviços":-144.4,"Mensalidade Cesta Serviço":-75.0,"FATURA CLARO":-29.71},"3":{"Tarifa Pacote de Serviços":-141.34},"4":{"Tarifa Pacote de Serviços":-141.34},"5":{"Tarifa Pacote de Serviços":-141.34},"6":{"Tarifa Pacote de Serviços":-141.34},"7":{"Tarifa Pacote de Serviços":-141.34},"8":{"Tarifa Pacote de Serviços":-141.34},"9":{"Tarifa Pacote de Serviços":-141.34},"10":{"Tarifa Pacote de Serviços":-141.34},"11":{"Tarifa Pacote de Serviços":-141.34}},"Despesas com Pessoal":{"0":{"SEGURADORA":-183.79},"1":{"SEGURADORA":-183.79},"2":{"SEGURADORA":-183.79},"3":{"SEGURADORA":-183.79},"4":{"SEGURADORA":-183.79},"5":{"SEGURADORA":-183.79},"6":{"SEGURADORA":-183.79},"7":{"SEGURADORA":-183.79},"8":{"SEGURADORA":-183.79},"9":{"SEGURADORA":-183.79},"10":{"SEGURADORA":-183.79},"11":{"SEGURADORA":-183.79}},"Custos com serviço":{"0":{"TFLE ANUAL 2025":-764.38},"2":{}},"Despesas com Infra e Softwares de Apoio":{"0":{"Msft E0700ybw8p ":-33.44,"Tiny ERP":-239.9},"1":{"Bumpe":-779.44,"Msft E0700ybw8p ":-33.44,"Tiny ERP":-239.9},"2":{"Extensioncenter Extension Cen De ":-54.45,"Msft E0700ybw8p ":-33.44,"Tiny ERP":-239.9},"3":{"Tiny ERP":-239.9},"4":{"Tiny ERP":-239.9},"5":{"Tiny ERP":-239.9},"6":{"Tiny ERP":-239.9},"7":{"Tiny ERP":-239.9},"8":{"Tiny ERP":-239.9},"9":{"Tiny ERP":-239.9},"10":{"Tiny ERP":-239.9},"11":{"Tiny ERP":-239.9}},"Deduções sobre Receitas":{"0":{},"2":{},"3":{"ISS Prestados":-200.0},"4":{"ISS Prestados":-200.0},"5":{"ISS Prestados":-200.0},"6":{"ISS Prestados":-200.0},"7":{"ISS Prestados":-200.0},"8":{"ISS Prestados":-200.0},"9":{"ISS Prestados":-200.0},"10":{"ISS Prestados":-200.0},"11":{"ISS Prestados":-200.0}},"Receitas Financeiras":{"0":{"Rendimentos no mês":21.27},"1":{"Rendimentos no mês":17.65},"2":{}},"Custos com produto":{"1":{"GUILE TRANSPORTES LTDA":-3370.0},"2":{}},"Outras saídas de caixa":{"1":{"Fatura Anterior":-403.23},"2":{}},"Despesas não operacionais":{"1":{"ICMS":-1015.0},"2":{"Parcelamento Imposto":-4656.54,"ICMS":-899.2},"3":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"4":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"5":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"6":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"7":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"8":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"9":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"10":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"11":{"Parcelamento Imposto":-4656.54,"ICMS":-850.62},"0":{"ICMS":-889.3}}}};
+const GROUPED=AD.grouped;
+const FORN_MES={"PAGTO CM CONTR ROTATIVO":[-0.01,-0.01,-0.01,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"PAGTO JUROS CONTR ROTATIV":[-0.01,-0.01,-36.85,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"IOF ADICIONAL PJ-CH. ESPE":[-4.32,-1.71,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"IOF BASICO CH PJ":[-0.28,-26.34,-52.78,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"COBRANÇA DE JUROS":[-53.26,-102.67,-102.67,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"DÉBITO DE IOF":[-2.01,-2.92,-2.92,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"CAIXA ECONOMICA EMPRÉSTIMO":[-6164.91,-13386.24,-6233.24,-6500.0,-6500.0,-6500.0,-6500.0,-6500.0,-6500.0,-6500.0,-6500.0,-6500.0,0.0],"W3M CONSULTORIA E SERVICOS":[-2000.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,-2500.0,0.0],"Liquidação de Parcela - Sicredi":[-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,-15137.93,0.0],"RESG.APLIC.FIN.AVISO PREV":[15137.93,0.0,13645.64,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Tarifa Pacote de Serviços":[-81.4,-333.4,-144.4,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,0.0],"SEGURADORA":[-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,0.0],"55619444000100 GRATUS COME":[62000.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"39.981.935DIRCEMARIADOSSANTOS":[-4800.0,0.0,-8700.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"PRIME HOUSE LTDA":[-7450.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"TFLE ANUAL 2025":[-764.38,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Vitor Rocha Monteiro De Az":[-5000.0,-4000.0,-2000.0,-2000.0,-2000.0,-2000.0,-2000.0,-2000.0,-2000.0,-2000.0,-2000.0,-2000.0,0.0],"Transferencia entre Contas":[0.0,1000.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Mensalidade Cesta Serviço":[-75.0,-75.0,-75.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Msft E0700ybw8p ":[-33.44,-33.44,-33.44,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Tiny ERP":[-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,0.0],"Soares Contabilidade":[-1886.94,0.0,-2187.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"ICMS":[-889.3,-1015.0,-899.2,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,-850.62,0.0],"Termo de Moedas":[-41192.93,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Juros Saldo Dev":[-237.85,-1058.98,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"IR sobre resgates no mês:":[-3.2,-0.14,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"IOF sobre resgates no mês:":[-10.13,-1.71,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Rendimentos no mês":[21.27,17.65,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"PR CONTABIIDADE E ASSESSORIA EMPRESARIAL LTDA":[0.0,-5200.0,-5200.0,-2600.0,-2600.0,-2600.0,-2600.0,-2600.0,-2600.0,-2600.0,-2600.0,-2600.0,0.0],"Hostgator":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"BhZassistem":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Contrat Câmbio Importação":[0.0,0.0,0.0,-41304.34,-55955.76,-33851.96,-19194.42,0.0,-28913.04,-39169.03,-23696.37,-13436.1,0.0],"TED 15446940000104 AMAZON SERVICOS DE VAREJO DO":[0.0,0.0,18409.02,149447.65,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.0],"ISS Prestados":[0.0,0.0,0.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,0.0],"IOF S/SALDO DEV":[0.0,-167.6,-13.27,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"MERCADO LIVRE - MERCADO PAGO":[0.0,9384.7,3072.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"GUILE TRANSPORTES LTDA":[0.0,-3370.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Tarifa Renovação Cadastro":[0.0,-36.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"AMZ COMERCIO FILIAL":[0.0,143500.0,20000.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"JUROS UTILIZ.CH.ESPECIAL":[0.0,-55.38,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Fatura Anterior":[0.0,-403.23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Bumpe":[0.0,-779.44,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Anuidade Diferenciada 11/12":[0.0,-37.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Juros Mora":[0.0,-4.14,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Juros do Rotativo":[0.0,-65.82,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Multa por Atraso":[0.0,-6.37,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"IOF de Financiamento":[0.0,-1.02,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Anuidade Diferenciada 12/12":[0.0,-37.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Ajuste Termo de Moedas":[0.0,-5880.63,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Tar Unica Contr Impor TP4":[0.0,-1100.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Retenção Imposto de Renda":[0.0,-209.29,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Despesa Externa":[0.0,0.0,-1268.88,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Ressarcimento de Tributo Des":[0.0,0.0,-422.96,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"FATURA CLARO":[0.0,0.0,-29.71,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Extensioncenter Extension Cen De ":[0.0,0.0,-54.45,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Parcelamento Imposto":[0.0,0.0,-4656.54,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"Weslley Santos Soares":[0.0,-3000.0,0.0,-149447.65,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"47341761000170 WRMB Empréstimo":[0.0,0.0,0.0,100000.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]};
+const FLUXO_ROWS=[{"k":"(=) Saldo Inicial","lbl":"(=) Saldo Inicial","tp":"saldo","v":[29924.41,20872.62,86216.14,14721.81,38407.35,-52558.52,-121420.59,-175625.12,-210635.23,-274558.38,-348737.52,-407444.0]},{"k":"Receitas de Vendas","lbl":"01 - (+) Receita Bruta","tp":"receita","v":[62000.0,9384.7,21481.02,149447.65,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01]},{"k":"Receitas Financeiras","lbl":"Receitas Financeiras","tp":"receita","v":[21.27,17.65,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{"k":"Deduções sobre Receitas","lbl":"02 - (-) Deduções sobre Receita","tp":"deducao","v":[0.0,0.0,0.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0,-200.0]},{"k":"Custos com produto","lbl":"Custos com produto","tp":"despesa","v":[0.0,-3370.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{"k":"Custos com serviço","lbl":"Custos com serviço","tp":"despesa","v":[-764.38,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{"k":"Despesas com Pessoal","lbl":"04 - (-) Despesas com Pessoal","tp":"despesa","v":[-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79,-183.79]},{"k":"Despesas com serviços terceirizados","lbl":"04 - (-) Terceirizados","tp":"despesa","v":[-13686.94,-11700.0,-20587.5,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0,-7100.0]},{"k":"Despesas com Infra e Softwares de Apoio","lbl":"04 - (-) Infra e Softwares","tp":"despesa","v":[-273.34,-1052.78,-327.79,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9,-239.9]},{"k":"Despesas Financeiras","lbl":"06 - (=) Resultado Financeiro","tp":"resultado","v":[-73.22,-435.84,-210.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{"k":"Despesas G&A","lbl":"04 - (-) Despesas G&A","tp":"despesa","v":[-156.4,-519.9,-249.11,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34,-141.34]},{"k":"Despesas não operacionais","lbl":"14 - Despesas não operacionais","tp":"despesa","v":[-889.3,-1015.0,-5555.74,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16,-5507.16]},{"k":"Outras saídas de caixa","lbl":"13 - (=) Outras movimentações","tp":"neutro","v":[0.0,-403.23,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{"k":"Empréstimos","lbl":"10 - (=) Empréstimos","tp":"neutro","v":[-70183.62,74637.49,-79563.01,-112389.92,-77593.69,-55489.89,-40832.35,-21637.93,-50550.97,-60806.96,-45334.3,-35074.03]},{"k":"Entrada de Transferência","lbl":"Entrada de Transferência","tp":"receita","v":[15137.93,0.0,13645.64,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]}];
+const SALDO_INI=[29924.41,20872.62,86216.14,14721.81,38407.35,-52558.52,-121420.59,-175625.12,-210635.23,-274558.38,-348737.52,-407444.0];
+const TOTAIS=[20872.62,86231.92,14721.81,38407.35,-52558.52,-121420.59,-175625.12,-210635.23,-274558.38,-348737.52,-407444.0,-455890.21];
+
+let tab='projecao',mes=null,search='';
+const expanded={},charts={};
+
+function fmtBR(v,force){
+  if((v===null||v===undefined||v===0)&&!force) return '';
+  const s=Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return v<0?'-'+s:(v>0?s:'0,00');
+}
+function fmtBig(v){
+  const a=Math.abs(v);
+  let s;
+  if(a>=1e6) s=(a/1e6).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' Mi';
+  else if(a>=1e3) s=(a/1e3).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' Mil';
+  else s=a.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return (v<0?'-':'')+s;
+}
+function vc(v){return v>0?'pos':v<0?'neg':'zer';}
+function getCols(){
+  if(mes!==null) return [mes];
+  if(tab==='realizado') return [0,1];
+  return Array.from({length:12},(_,i)=>i);
+}
+function getDerived(){
+  const rec=AD.classif_mes['01 - (+) Receita Bruta']||Array(12).fill(0);
+  const dedu=AD.classif_mes['02 - (-) Deduções sobre Receita']||Array(12).fill(0);
+  const desp=AD.classif_mes['04 - (-) Despesas']||Array(12).fill(0);
+  const res_fin=AD.classif_mes['06 - (=) Resultado Financeiro']||Array(12).fill(0);
+  const ir=AD.classif_mes['07 - (-) IR & CSLL']||Array(12).fill(0);
+  const outr=AD.classif_mes['13 - (=) Outras movimentações de caixa']||Array(12).fill(0);
+  const rec_liq=rec.map((v,i)=>v+dedu[i]);
+  const ebitda=rec_liq.map((v,i)=>v+desp[i]);
+  const lucro=ebitda.map((v,i)=>v+res_fin[i]+ir[i]);
+  const saldo_fim=TOTAIS;
+  return {rec,dedu,desp,res_fin,ir,outr,rec_liq,ebitda,lucro,saldo_fim};
+}
+
+// ── KPI STRIP ──────────────────────────────────────────
+function renderKPIs(){
+  const cols=getCols();
+  const rec=FLUXO_ROWS.filter(r=>r.tp==='receita').reduce((s,r)=>s+cols.reduce((a,i)=>a+r.v[i],0),0);
+  const desp=FLUXO_ROWS.filter(r=>!['saldo','receita'].includes(r.tp)).reduce((s,r)=>s+cols.reduce((a,i)=>a+r.v[i],0),0);
+  const res=rec+desp;
+  const sf=mes!==null?TOTAIS[mes]:TOTAIS[cols[cols.length-1]];
+  const kpis=[
+    {n:'Entradas',v:rec},{n:'Saídas',v:desp},
+    {n:'Resultado',v:res},{n:'Saldo Final',v:sf,p:sf>=0?'Positivo':'Negativo'},
+    {n:'Geração de Caixa',v:res}
+  ];
+  document.getElementById('krow').innerHTML=kpis.map(k=>{
+    const c=k.v>0?'pos':k.v<0?'neg':'';
+    return '<div class="kcard"><div class="kn">'+k.n+'</div><div class="kv '+c+'">'+fmtBig(k.v)+'</div>'
+      +'<div class="kp">'+(k.p||'&mdash;')+'</div><div class="kr">Em relação ao ano anterior</div></div>';
+  }).join('');
+}
+
+// ── FLUXO ──────────────────────────────────────────────
+function renderFluxo(){
+  const cols=getCols();
+  const sq=search.toLowerCase();
+  const matchForn={};
+  if(sq){
+    FLUXO_ROWS.forEach(row=>{
+      const gd=GROUPED[row.k]||{};
+      cols.forEach(i=>{Object.keys(gd[String(i)]||{}).forEach(fn=>{if(fn.toLowerCase().includes(sq)) matchForn[row.k+'|'+fn]=true;});});
+      if(row.lbl.toLowerCase().includes(sq)) matchForn['__g__'+row.k]=true;
+    });
+  }
+  let h='<thead><tr><th>Grupo DRE</th>';
+  cols.forEach(i=>{ h+='<th class="'+(REAL.includes(i)?'cr':'')+'">'+(MESES[i])+'</th>'; });
+  h+='<th class="ct">Total</th></tr></thead><tbody>';
+  let vg=0;
+  FLUXO_ROWS.forEach((row,ri)=>{
+    const vals=cols.map(i=>row.v[i]||0);
+    const isSaldo=row.tp==='saldo';
+    const tot=isSaldo?vals[0]:vals.reduce((a,b)=>a+b,0);
+    if(tot===0&&vals.every(v=>v===0)&&!isSaldo) return;
+    const gm=!sq||matchForn['__g__'+row.k];
+    const hfm=!sq||Object.keys(matchForn).some(k=>k.startsWith(row.k+'|'));
+    if(sq&&!gm&&!hfm) return;
+    vg++;
+    h+='<tr class="grp" onclick="toggle('+ri+')">';
+    h+='<td><span class="exp" id="exp'+ri+'">+</span>'+row.lbl+'</td>';
+    vals.forEach((v,ci)=>{ const r=REAL.includes(cols[ci]); h+='<td class="'+(r?'cr ':'')+vc(v)+'">'+(v?fmtBR(v):'')+'</td>'; });
+    h+='<td class="ct '+vc(tot)+'">'+(tot?fmtBR(tot):'')+'</td></tr>';
+    // Fornecedor sub-rows
+    const gd=GROUPED[row.k]||{};
+    const af={};
+    cols.forEach(i=>Object.keys(gd[String(i)]||{}).forEach(fn=>af[fn]=true));
+    Object.entries(af).forEach(([fn])=>{
+      const fm=!sq||(fn.toLowerCase().includes(sq)||gm);
+      if(sq&&!fm) return;
+      const fv=cols.map(i=>(gd[String(i)]||{})[fn]||0);
+      const ft=fv.reduce((a,b)=>a+b,0);
+      if(ft===0&&fv.every(v=>v===0)) return;
+      h+='<tr class="sub '+(sq&&fm?'vis':'')+' frow-'+ri+'">';
+      h+='<td>'+fn+'</td>';
+      fv.forEach((v,ci)=>{ const r=REAL.includes(cols[ci]); h+='<td class="'+(r?'cr ':'')+vc(v)+'">'+(v?fmtBR(v):'')+'</td>'; });
+      h+='<td class="ct '+vc(ft)+'">'+(ft?fmtBR(ft):'')+'</td></tr>';
+    });
+  });
+  h+='<tr class="ttl"><td>Total</td>';
+  cols.forEach(i=>{ h+='<td class="'+(REAL.includes(i)?'cr':'')+' '+vc(TOTAIS[i])+'">'+fmtBR(TOTAIS[i])+'</td>'; });
+  h+='<td class="ct">'+fmtBR(TOTAIS[cols[cols.length-1]],true)+'</td></tr></tbody>';
+  document.getElementById('tbl-fluxo').innerHTML=h;
+  document.getElementById('cnt_lbl').textContent=vg+' grupos';
+  if(sq) FLUXO_ROWS.forEach((_,ri)=>{ if(Object.keys(matchForn).some(k=>k.startsWith(_.k+'|'))) expand(ri,true); });
+}
+
+// ── DRE ────────────────────────────────────────────────
+function renderDRE(){
+  const cols=getCols();
+  const der=getDerived();
+  const DRE=[
+    {lbl:'01 - (+) Receita Bruta',             tp:'R', arr:der.rec},
+    {lbl:'02 - (-) Deduções',        tp:'D', arr:der.dedu},
+    {lbl:'= Receita Líquida',              tp:'S', arr:der.rec_liq},
+    {lbl:'04 - (-) Despesas Operacionais',       tp:'D', arr:der.desp},
+    {lbl:'= EBITDA',                             tp:'S', arr:der.ebitda},
+    {lbl:'06 - (=) Resultado Financeiro',        tp:'D', arr:der.res_fin},
+    {lbl:'07 - (-) IR & CSLL',                  tp:'D', arr:der.ir},
+    {lbl:'= Lucro / Prejuízo',             tp:'S', arr:der.lucro},
+    {lbl:'13 - (=) Outras movimentações',tp:'N',arr:der.outr},
+    {lbl:'= Saldo Final',                        tp:'S', arr:der.saldo_fim},
+  ];
+  let h='<thead><tr><th>Classificação DRE</th>';
+  cols.forEach(i=>{ h+='<th class="'+(REAL.includes(i)?'cr':'')+'">'+(MESES[i])+'</th>'; });
+  h+='<th class="ct">Total Ano</th></tr></thead><tbody>';
+  DRE.forEach(row=>{
+    const vals=cols.map(i=>row.arr[i]||0);
+    const isSaldoFinal=row.lbl==='= Saldo Final';
+    const tot=isSaldoFinal?vals[vals.length-1]:vals.reduce((a,b)=>a+b,0);
+    const iS=row.tp==='S';
+    h+='<tr class="'+(iS?'sum-row':'')+'">';
+    h+='<td>'+(iS?'<strong>'+row.lbl+'</strong>':row.lbl)+'</td>';
+    vals.forEach((v,ci)=>{ const r=REAL.includes(cols[ci]); h+='<td class="'+(r?'cr ':'')+vc(v)+'">'+(v?fmtBR(v):'')+'</td>'; });
+    h+='<td class="ct '+vc(tot)+'"><strong>'+(tot?fmtBR(tot):'&mdash;')+'</strong></td></tr>';
+  });
+  h+='</tbody>';
+  document.getElementById('tbl-dre').innerHTML=h;
+}
+
+// ── CAIXA ──────────────────────────────────────────────
+function renderCaixa(){
+  const cols=getCols();
+  // Approximate BB/SICREDI split from saldo ini data
+  // Saldo INICIAL de cada mês por banco (fonte: planilha Base, linhas (=) Saldo Inicial)
+  // índice 0=Jan saldo ini, 1=Fev saldo ini, 2=Mar saldo ini (= saldo final Fev), etc.
+  const bbVals=[14019.36,-41430.78,86264.58,11039.79,-91689.72,-145058.27,-180523.02,-201330.23,-202943.02,-233468.85,-274250.67,-299559.83];
+  const siVals=[16376.11,63088.52,137.56,2465.64,113358.9,75945.37,42731.84,9518.31,-23695.22,-56908.75,-90122.28,-123335.81];
+const cxVals=[-471.06,-785.12,-186.0,1216.38,16738.17,16554.38,16370.59,16186.8,16003.01,15819.22,15635.43,15451.64];
+  // Saldo FINAL = saldo inicial do mês seguinte
+  // Para o período selecionado, pegar o último mês e mostrar o saldo final dele (ini[m+1])
+  const lastRealMes = cols.filter(i=>REAL.includes(i));
+  const refMes = lastRealMes.length ? Math.max(...lastRealMes) : Math.max(...cols);
+  // saldo final de refMes = bbVals[refMes+1] (início do próximo mês)
+  const lastBB = refMes+1 < bbVals.length ? bbVals[refMes+1] : bbVals[refMes];
+  const lastSI = refMes+1 < siVals.length ? siVals[refMes+1] : siVals[refMes];
+  const lastTotal = lastBB + lastSI;
+  const refLabel = MESES[refMes] ? MESES[refMes].charAt(0).toUpperCase()+MESES[refMes].slice(1)+'/2026' : '';
+  document.getElementById('caixa-bb').innerHTML=
+    '<div class="kn">Saldo Final — '+refLabel+'</div>'
+    +'<div class="kv '+(lastBB>=0?'pos':'neg')+'">'+fmtBig(lastBB)+'</div>'
+    +'<div class="sub">Banco do Brasil 58179-8</div>'
+    +'<div class="delta">'+(lastBB>=0?'&#9650; Positivo':'&#9660; Negativo')+'</div>';
+  document.getElementById('caixa-si').innerHTML=
+    '<div class="kn">Saldo Final — '+refLabel+'</div>'
+    +'<div class="kv '+(lastSI>=0?'pos':'neg')+'">'+fmtBig(lastSI)+'</div>'
+    +'<div class="sub">SICREDI 74762-5</div>'
+    +'<div class="delta">'+(lastSI>=0?'&#9650; Positivo':'&#9660; Negativo')+'</div>';
+  destroyChart('chart-caixa');
+  const ctx=document.getElementById('chart-caixa').getContext('2d');
+  charts['chart-caixa']=new Chart(ctx,{
+    type:'line',
+    data:{labels:MABR,datasets:[
+      {label:'Saldo Acumulado',data:TOTAIS,borderColor:'#f5a623',backgroundColor:'#f5a62218',fill:true,tension:0.4,
+       pointRadius:TOTAIS.map((_,i)=>REAL.includes(i)?5:3),
+       pointBackgroundColor:TOTAIS.map((_,i)=>REAL.includes(i)?'#f5a623':'#ddd'),borderWidth:2.5},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#888',font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmtBR(c.raw,true)}}},
+      scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#f5f5f5'}},
+              y:{ticks:{color:'#888',font:{size:10},callback:v=>fmtBig(v)},grid:{color:'#f5f5f5'}}}}
+  });
+  // Dados de status separados: entradas realizadas, saídas realizadas, saídas projetadas
+  const ENTRADAS_REAL=[77159.2,84039.84,35126.66,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
+  const SAIDAS_REAL=[-86210.99,-18680.54,-106620.99,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
+  const SAIDAS_PREV=[0.0,0.0,0.0,-125762.11,-90965.88,-68862.08,-54204.54,-35010.12,-63923.16,-74179.15,-58706.49,-48446.22];
+  const rows3=[
+    {label:'↑ Entradas Realizadas', data:ENTRADAS_REAL, badge:'pago', desc:'Receitas efetivamente recebidas'},
+    {label:'↓ Saídas Realizadas',   data:SAIDAS_REAL,   badge:'venc', desc:'Despesas efetivamente pagas'},
+    {label:'⏱ Saídas Projetadas',   data:SAIDAS_PREV,   badge:'prev', desc:'Despesas ainda não pagas'},
+  ];
+  // Totais para cards
+  const totEntReal=cols.reduce((s,i)=>s+(ENTRADAS_REAL[i]||0),0);
+  const totSaiReal=cols.reduce((s,i)=>s+(SAIDAS_REAL[i]||0),0);
+  const totSaiPrev=cols.reduce((s,i)=>s+(SAIDAS_PREV[i]||0),0);
+  const totSaiTotal=totSaiReal+totSaiPrev;
+  const execPct=totSaiTotal!==0?Math.round(Math.abs(totSaiReal)/Math.abs(totSaiTotal)*100):0;
+  // Cards de resumo
+  const smEl=document.getElementById('status-summary');
+  if(smEl){
+    const cardStyle='padding:12px 16px;border-right:1px solid #f5f5f5;';
+    smEl.innerHTML=
+      '<div style="'+cardStyle+'">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#aaa;margin-bottom:4px;">&#9650; Entradas Realizadas</div>'
+        +'<div style="font-size:18px;font-weight:800;color:#1a9e5c;">'+fmtBig(totEntReal)+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:2px;">Receitas efetivamente recebidas</div>'
+      +'</div>'
+      +'<div style="'+cardStyle+'">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#aaa;margin-bottom:4px;">&#9660; Sa&#237;das Realizadas</div>'
+        +'<div style="font-size:18px;font-weight:800;color:#e03535;">'+fmtBig(totSaiReal)+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:2px;">Despesas efetivamente pagas</div>'
+      +'</div>'
+      +'<div style="padding:12px 16px;">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#aaa;margin-bottom:4px;">&#8987; Sa&#237;das Projetadas</div>'
+        +'<div style="font-size:18px;font-weight:800;color:#f5a623;">'+fmtBig(totSaiPrev)+'</div>'
+        +'<div style="font-size:10px;color:#888;margin-top:2px;">Despesas ainda n&#227;o pagas</div>'
+      +'</div>';
+  }
+  // Barra de progresso
+  const barEl=document.getElementById('exec-bar');
+  const pctEl=document.getElementById('exec-pct');
+  if(barEl) barEl.style.width=Math.min(execPct,100)+'%';
+  if(pctEl) pctEl.textContent=execPct+'% das sa&#237;das j&#225; pagas';
+  // Tabela detalhada com 3 linhas
+  let h='<thead><tr><th>Status</th>'+cols.map(i=>'<th class="'+(REAL.includes(i)?'cr':'')+'">'+(MESES[i])+'</th>').join('')+'<th class="ct">Total</th></tr></thead><tbody>';
+  rows3.forEach((row)=>{
+    const vals=cols.map(i=>row.data[i]||0);
+    const tot=vals.reduce((a,b)=>a+b,0);
+    if(tot===0&&vals.every(v=>v===0)) return;
+    h+='<tr><td><span class="sbadge '+row.badge+'">'+row.label+'</span><div style="font-size:9px;color:#aaa;margin-top:2px;padding-left:2px;">'+row.desc+'</div></td>';
+    vals.forEach((val,ci)=>{ const r=REAL.includes(cols[ci]); h+='<td class="'+(r?'cr ':'')+vc(val)+'">'+(val?fmtBR(val):'')+'</td>'; });
+    h+='<td class="ct '+vc(tot)+'"><strong>'+fmtBR(tot,true)+'</strong></td></tr>';
+  });
+  document.getElementById('tbl-status').innerHTML=h+'</tbody>';
+}
+
+// ── ANÁLISES ───────────────────────────────────────────
+function renderAnalises(){
+  const cols=getCols();
+  const der=getDerived();
+  const COLORS=['#f5a623','#1a9e5c','#3b82f6','#e03535','#8b5cf6','#06b6d4','#f97316','#ec4899','#64748b'];
+  destroyChart('chart-recdesp');
+  charts['chart-recdesp']=new Chart(document.getElementById('chart-recdesp').getContext('2d'),{
+    type:'bar',
+    data:{labels:MABR,datasets:[
+      {label:'Receitas',data:der.rec,backgroundColor:der.rec.map((_,i)=>REAL.includes(i)?'#1a9e5ccc':'#1a9e5c44'),borderRadius:4},
+      {label:'Despesas',data:der.desp.map(v=>Math.abs(v)),backgroundColor:der.desp.map((_,i)=>REAL.includes(i)?'#e03535cc':'#e0353544'),borderRadius:4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#888',font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>' '+fmtBR(c.raw,true)}}},
+      scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{display:false}},
+              y:{ticks:{color:'#888',font:{size:10},callback:v=>fmtBig(v)},grid:{color:'#f5f5f5'}}}}
+  });
+  const dep=AD.depara||{};
+  const depL=Object.keys(dep).filter(k=>cols.reduce((s,i)=>s+(dep[k][i]||0),0)<0);
+  const depT=depL.map(k=>Math.abs(cols.reduce((s,i)=>s+(dep[k][i]||0),0)));
+  destroyChart('chart-depara');
+  charts['chart-depara']=new Chart(document.getElementById('chart-depara').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:depL,datasets:[{data:depT,backgroundColor:COLORS.map(c=>c+'cc'),borderColor:COLORS,borderWidth:1.5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+      plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:10},padding:5,usePointStyle:true}},
+               tooltip:{callbacks:{label:c=>' '+fmtBig(c.raw)+' ('+((c.raw/depT.reduce((a,b)=>a+b,0))*100).toFixed(1)+'%)'}}}}}
+  );
+  destroyChart('chart-saldo');
+  charts['chart-saldo']=new Chart(document.getElementById('chart-saldo').getContext('2d'),{
+    type:'line',
+    data:{labels:MABR,datasets:[
+      {label:'Saldo Acumulado',data:TOTAIS,borderColor:'#3b82f6',backgroundColor:'#3b82f610',fill:true,tension:0.4,borderWidth:2,
+       pointRadius:TOTAIS.map((_,i)=>REAL.includes(i)?5:3),
+       pointBackgroundColor:TOTAIS.map((_,i)=>REAL.includes(i)?'#3b82f6':'#cbd5e1')},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#888',font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmtBR(c.raw,true)}}},
+      scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#f5f5f5'}},
+              y:{ticks:{color:'#888',font:{size:10},callback:v=>fmtBig(v)},grid:{color:'#f5f5f5'}}}}
+  });
+  const cat=AD.cat||{};
+  const catD=Object.entries(cat)
+    .map(([k,v])=>({k,tot:cols.reduce((s,i)=>s+(v[i]||0),0)}))
+    .filter(x=>x.tot<0)
+    .map(x=>({k:x.k,tot:Math.abs(x.tot)}))
+    .sort((a,b)=>b.tot-a.tot).slice(0,8);
+  destroyChart('chart-categ');
+  charts['chart-categ']=new Chart(document.getElementById('chart-categ').getContext('2d'),{
+    type:'bar',
+    data:{labels:catD.map(x=>x.k.replace(/^\d+\.[\d.]*\s*-\s*/,'')),datasets:[{data:catD.map(x=>x.tot),backgroundColor:COLORS.map(c=>c+'bb'),borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtBig(c.raw)}}},
+      scales:{x:{ticks:{color:'#888',font:{size:10},callback:v=>fmtBig(v)},grid:{color:'#f5f5f5'}},
+              y:{ticks:{color:'#888',font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── KPIs PAGE ──────────────────────────────────────────
+function renderKPIsPage(){
+  const cols=getCols();
+  const der=getDerived();
+  const sumV=arr=>cols.reduce((s,i)=>s+(arr[i]||0),0);
+  const recT=sumV(der.rec),despT=Math.abs(sumV(der.desp)),lucroT=sumV(der.lucro);
+  const margemB=recT>0?((recT-despT)/recT*100):0;
+  const margemL=recT>0?(lucroT/recT*100):0;
+  const saldoF=mes!==null?TOTAIS[mes]:TOTAIS[cols[cols.length-1]];
+  // Burn Rate = total de todas as saídas / nº de meses
+  const todasSaidas=Math.abs(sumV(der.desp))+Math.abs(sumV(der.res_fin))+Math.abs(sumV(der.ir))+Math.abs(sumV(der.dedu))+Math.abs(sumV(der.outr));
+  const burnR=todasSaidas/Math.max(cols.length,1);
+  const kpiDefs=[
+    {n:'Receita Bruta',v:recT,tp:'pos',sub:'Total período'},
+    {n:'Total Despesas',v:-despT,tp:'neg',sub:'Total período'},
+    {n:'Lucro / Prejuízo',v:lucroT,tp:lucroT>=0?'pos':'neg',sub:'Resultado líquido'},
+    {n:'Margem Bruta',v:margemB,tp:margemB>=0?'pos':'neg',sub:'% sobre receita',pct:true},
+    {n:'Margem Líquida',v:margemL,tp:margemL>=0?'pos':'neg',sub:'% sobre receita',pct:true},
+    {n:'Saldo Projetado',v:saldoF,tp:saldoF>=0?'pos':'neg',sub:'Acumulado'},
+    {n:'Geração de Caixa',v:lucroT,tp:lucroT>=0?'pos':'neg',sub:'Resultado op.'},
+    {n:'Burn Rate',v:-burnR,tp:'neg',sub:'Média mensal'},
+  ];
+  document.getElementById('kpi-cards').innerHTML=kpiDefs.map(k=>{
+    const val=k.pct?k.v.toFixed(1)+'%':fmtBig(k.v);
+    return '<div class="card"><div class="kpi-big"><div class="kn">'+k.n+'</div><div class="kv '+k.tp+'">'+val+'</div><div class="sub">'+k.sub+'</div></div></div>';
+  }).join('');
+  const mB12=der.rec.map((v,i)=>v>0?((v-Math.abs(der.desp[i]))/v*100):0);
+  const mL12=der.lucro.map((v,i)=>der.rec[i]>0?(v/der.rec[i]*100):0);
+  destroyChart('chart-margem');
+  charts['chart-margem']=new Chart(document.getElementById('chart-margem').getContext('2d'),{
+    type:'line',
+    data:{labels:MABR,datasets:[
+      {label:'Margem Bruta %',data:mB12,borderColor:'#1a9e5c',backgroundColor:'#1a9e5c18',fill:true,tension:0.4,borderWidth:2,pointRadius:3},
+      {label:'Margem Líquida %',data:mL12,borderColor:'#3b82f6',backgroundColor:'#3b82f608',fill:true,tension:0.4,borderWidth:2,borderDash:[4,3],pointRadius:3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#888',font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw.toFixed(1)+'%'}}},
+      scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{color:'#f5f5f5'}},
+              y:{ticks:{color:'#888',font:{size:10},callback:v=>v.toFixed(0)+'%'},grid:{color:'#f5f5f5'}}}}
+  });
+  const meta=Array(12).fill(18000);
+  destroyChart('chart-meta');
+  charts['chart-meta']=new Chart(document.getElementById('chart-meta').getContext('2d'),{
+    type:'bar',
+    data:{labels:MABR,datasets:[
+      {label:'Receita',data:der.rec,backgroundColor:der.rec.map((_,i)=>REAL.includes(i)?'#f5a623bb':'#f5a62344'),borderRadius:4},
+      {type:'line',label:'Meta',data:meta,borderColor:'#e03535',borderDash:[5,4],borderWidth:2,pointRadius:0,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#888',font:{size:11},usePointStyle:true}},tooltip:{callbacks:{label:c=>' '+fmtBR(c.raw,true)}}},
+      scales:{x:{ticks:{color:'#888',font:{size:10}},grid:{display:false}},
+              y:{ticks:{color:'#888',font:{size:10},callback:v=>fmtBig(v)},grid:{color:'#f5f5f5'}}}}
+  });
+  // Top 10 filtrado por cols + slot 12 (sem mês) quando visão anual
+  const colsF=mes===null?[...cols,12]:cols;
+  const forns={};
+  Object.entries(FORN_MES).forEach(([fn,vals])=>{
+    const tot=colsF.reduce((s,i)=>s+(vals[i]||0),0);
+    if(tot<0) forns[fn]=tot;
+  });
+  const top10=Object.entries(forns).sort((a,b)=>a[1]-b[1]).slice(0,10);
+  let h='<thead><tr><th>#</th><th>Fornecedor</th><th class="ct">Total Ano</th></tr></thead><tbody>';
+  top10.forEach(([fn,v],i)=>{ h+='<tr><td style="color:#aaa;text-align:right">'+(i+1)+'</td><td>'+fn+'</td><td class="ct neg">'+fmtBR(v,true)+'</td></tr>'; });
+  document.getElementById('tbl-top10').innerHTML=h+'</tbody>';
+}
+
+// ── NAV / CONTROLS ─────────────────────────────────────
+let currentPage='fluxo';
+function goPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('vis'));
+  document.getElementById('page-'+id).classList.add('vis');
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('on'));
+  el.classList.add('on');
+  currentPage=id;
+  const renders={fluxo:renderFluxo,dre:renderDRE,caixa:renderCaixa,analises:renderAnalises,kpis:renderKPIsPage};
+  if(renders[id]) renders[id]();
+}
+function setTab(t,btn){
+  tab=t; document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on');
+  refreshAll();
+}
+function onMes(){
+  const v=document.getElementById('mf').value; mes=v===''?null:parseInt(v); refreshAll();
+}
+function onSearch(){
+  search=document.getElementById('srch').value;
+  Object.keys(expanded).forEach(k=>delete expanded[k]); renderFluxo();
+}
+function refreshAll(){
+  renderKPIs();
+  const renders={fluxo:renderFluxo,dre:renderDRE,caixa:renderCaixa,analises:renderAnalises,kpis:renderKPIsPage};
+  if(renders[currentPage]) renders[currentPage]();
+}
+function toggle(ri){expanded[ri]?collapse(ri):expand(ri,false);}
+function expand(ri,force){
+  if(expanded[ri]&&!force) return; expanded[ri]=true;
+  document.querySelectorAll('.frow-'+ri).forEach(r=>r.classList.add('vis'));
+  const e=document.getElementById('exp'+ri); if(e) e.classList.add('open');
+}
+function collapse(ri){
+  expanded[ri]=false;
+  document.querySelectorAll('.frow-'+ri).forEach(r=>r.classList.remove('vis'));
+  const e=document.getElementById('exp'+ri); if(e) e.classList.remove('open');
+}
+function destroyChart(id){ if(charts[id]){charts[id].destroy();delete charts[id];} }
+
+renderKPIs();
+renderFluxo();
+</script>
+</body>
+</html>
